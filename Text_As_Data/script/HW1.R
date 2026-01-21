@@ -75,8 +75,10 @@ word_counts_normalized <- word_counts %>%
 word_counts_normalized
 
 # Trade:
-word_counts_normalized %>%
+trade <- word_counts_normalized %>%
   filter(word == "trade")
+
+trade
 
 # Plot:
 plot_n_words <- 20
@@ -94,21 +96,29 @@ top_words <- word_comp_tbl %>%
   slice_head(n = plot_n_words) %>%
   select(word)
 
-word_plot_data <- word_counts_normalized %>%
-  semi_join(top_words, by = "word") %>%
-  mutate(word = fct_reorder(word, relative_freq, .fun = max))
+word_plot_data <- word_comp_tbl %>%
+  slice_head(n = plot_n_words) %>%
+  pivot_longer(
+    cols = c(`Text A`, `Text B`),
+    names_to = "doc_title",
+    values_to = "n"
+  ) %>%
+  left_join(doc_lengths, by = "doc_title") %>%
+  mutate(
+    relative_freq = n / total_words,
+    word = fct_reorder(word, max_n)
+  )
 
 ggplot(word_plot_data, aes(x = relative_freq, y = word)) +
   geom_col() +
   facet_wrap(~ doc_title, scales = "free_x") +
   labs(
-    title = "Most frequent words (normalized by document length)",
+    title = "Most frequent words",
     subtitle = paste0(
       "Top ", plot_n_words,
-      " words selected using raw counts (Week 02), plotted as relative frequency"
+      " words selected using raw counts, plotted as relative frequency"
     ),
     x = "Relative frequency of word",
     y = NULL
   ) +
   theme_minimal()
-

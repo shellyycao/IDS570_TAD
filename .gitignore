@@ -1,0 +1,3 @@
+Text_As_Data/python/data/merchant_labeled_chunks.json
+Text_As_Data/python/models/*.npy
+Text_As_Data/python/models/*.bin*
